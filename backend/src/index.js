@@ -22,20 +22,16 @@ const baseUrl =
     ? 'https://thy-khuu-porfolio-production.up.railway.app'
     : `http://localhost:${port}`;
 
-// ✅ CORS config
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:4000',
-  'https://thy-khuu-porfolio.vercel.app',
-];
+// // ✅ CORS config
+// const allowedOrigins = [
+//   'http://localhost:3000',
+//   'http://localhost:4000',
+//   'https://thy-khuu-porfolio.vercel.app',
+// ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS: ' + origin));
-    }
+  origin: (origin, callback) => {
+    callback(null, true); // accept all origins
   },
   credentials: true,
 }));
@@ -77,7 +73,7 @@ app.use(
 );
 
 app.listen(port, () => {
-  console.log(`🚀 Apollo Server running in ${env} mode at ${baseUrl}/graphql`);
+  console.log(`🚀 Apollo Server running in ${env} mode at ${baseUrl}/api/graphql`);
 });
 
 // ✅ Cleanup
