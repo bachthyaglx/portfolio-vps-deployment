@@ -19,7 +19,7 @@ const env = process.env.NODE_ENV;
 
 const baseUrl =
   env === 'production'
-    ? 'https://thy-khuu-porfolio-production.up.railway.app'
+    ? 'http://ec2-63-177-236-139.eu-central-1.compute.amazonaws.com/'
     : `http://localhost:${port}`;
 
 // // ✅ CORS config
