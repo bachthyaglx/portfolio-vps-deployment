@@ -19,15 +19,15 @@ export default function HomePage() {
             <p className="desktop:text-[3vw] mobile:text-[5vw]">A developer specializing in web applications with&nbsp;
               <Typing />
             </p>
-            <div className='flex mobile:hidden mt-6 justify-start w-[17vw]'>
-              <SocialMedia size={200} />
-            </div>
+            
+            <SocialMedia size={50} />
+
           </div>
 
           <Image
             className="w-2/5 mobile:w-full mobile:max-w-xl object-contain self-center animate-scalepulse" 
-            src="/portraitdummy.webp" 
-            alt="Portrait" 
+            src="/portraitdummy.webp"
+            alt="Portrait"
             width={800}
             height={800}
             priority={true}
