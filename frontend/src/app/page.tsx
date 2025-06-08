@@ -20,20 +20,19 @@ export default function HomePage() {
               Greetings, I&apos;m Thy
             </p>
             <p
-              className="mb-4 leading-tight"
+              className="mb-4 pr-4 leading-tight"
               style={{ fontSize: 'clamp(1.5rem, 3vw, 3.5rem)' }}
             >
               A developer specializing in web applications with&nbsp;
               <Typing />
             </p>
 
-            <div className="flex desktop:justify-start mobile:justify-center mt-4">
+            <div className="flex desktop:justify-start mobile:justify-center mt-4 pb-10">
               <SocialMedia />
             </div>
           </div>
 
           <Timeline />
-
         </div>
       </div>
     </>
