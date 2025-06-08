@@ -3,7 +3,6 @@
 
 import Typing from '@/components/utils/Typing';
 import SocialMedia from '@/components/utils/SocialMedia';
-import Image from 'next/image'
 import Timeline from '@/components/utils/TimeLine';
 
 export default function HomePage() {

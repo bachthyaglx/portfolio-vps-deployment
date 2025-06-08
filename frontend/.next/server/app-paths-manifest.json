@@ -1,10 +1,10 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
   "/certificates/page": "app/certificates/page.js",
-  "/contact/page": "app/contact/page.js",
   "/experience/page": "app/experience/page.js",
   "/education/page": "app/education/page.js",
-  "/page": "app/page.js",
   "/projects/page": "app/projects/page.js",
-  "/projects/[category]/page": "app/projects/[category]/page.js"
+  "/projects/[category]/page": "app/projects/[category]/page.js",
+  "/contact/page": "app/contact/page.js",
+  "/page": "app/page.js"
 }
