@@ -2,22 +2,12 @@
 'use client';
 
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
-import { createUploadLink } from 'apollo-upload-client';
 import { setContext } from '@apollo/client/link/context';
+import { createUploadLink } from 'apollo-upload-client';
 
-// ✅ Must use NEXT_PUBLIC_ variables on the client
-const apiEnv = process.env.NEXT_PUBLIC_API_ENV;
-
-const uri =
-  apiEnv === 'prod'
-    ? process.env.NEXT_PUBLIC_PROD_GRAPHQL_URL
-    : process.env.NEXT_PUBLIC_DEV_GRAPHQL_URL;
-
-console.log('🌐 API ENV:', apiEnv);
-console.log('🔗 GraphQL URL:', uri);
+const uri = process.env.NEXT_PUBLIC_GRAPHQL_URL;
 
 const authLink = setContext((_, { headers }) => {
-  // ⚠️ Avoid ReferenceError: localStorage is not defined
   const token = typeof window !== 'undefined' ? localStorage.getItem("app-user-token") : null;
 
   return {

@@ -1,7 +1,7 @@
 // src/app/experience/page.tsx
 'use client';
 
-import SharedModalPageController from '@/components/sharedDashboard/SharedModalPageController';
+import { SharedPageModal } from '@/components/shared';
 import {
   GET_WORK_EXPERIENCES,
   DELETE_WORK_EXPERIENCE,
@@ -13,13 +13,13 @@ import {
 
 export default function ExperiencePage() {
   return (
-    <SharedModalPageController
+    <SharedPageModal
       // GraphQL queries and mutations
       query={GET_WORK_EXPERIENCES}
       deleteMutation={DELETE_WORK_EXPERIENCE}
       createMutation={CREATE_WORK_EXPERIENCE}
       editMutation={EDIT_WORK_EXPERIENCE}
-      uploadMutation={SINGLE_UPLOAD}
+      uploadFileMutation={SINGLE_UPLOAD}
       deleteFileMutation={DELETE_FILE_FROM_S3}
 
       // Page title and data key
@@ -48,7 +48,7 @@ export default function ExperiencePage() {
         { name: 'endDate', type: 'date', label: 'End Date' },
         { name: 'skills', type: 'text', label: 'Skills (comma-separated)' },
         { name: 'description', type: 'textarea', label: 'Description' },
-      ]}  
+      ]}
 
       // File fields for uploading files
       fileFields={[

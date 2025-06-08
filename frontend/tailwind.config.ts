@@ -9,14 +9,13 @@ const config: Config = {
   ],
   theme: {
     screens: {
-      'mobile': {'max': '1023px'},
-      'desktop': {'min': '1024px'},
+      'mobile': { 'max': '767px' }, // up to 767px → mobile
+      'desktop': { 'min': '1024px' }, // from 1024px up → desktop
     },
     extend: {
       colors: {
         lightcyan: '#84ffff',
-      //   gradientLeft: '#8e24aa',
-      //   gradientRight: '#1e88e5',
+
       },
       animation: {
         scalepulse: "scalepulse 8s ease-in-out infinite",
@@ -25,24 +24,23 @@ const config: Config = {
       keyframes: {
         scalepulse: {
           '0%': { "scale": "1" },
-         '50%': { "scale": "1.05" },
-         '100%': { "scale": "1" },
+          '50%': { "scale": "1.05" },
+          '100%': { "scale": "1" },
         },
         moveFade: {
-          '0%': { 
+          '0%': {
             opacity: "0",
             transform: "rotate(45deg) translate(-10px, -10px)",
           },
-          '50%': { 
+          '50%': {
             opacity: "1",
           },
-          '100%': {    
+          '100%': {
             opacity: "0",
             transform: "rotate(45deg) translate(10px, 10px)",
           }
         }
       },
-   
     },
   },
   plugins: [],

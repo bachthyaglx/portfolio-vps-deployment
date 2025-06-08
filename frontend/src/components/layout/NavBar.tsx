@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import LoginModal from '../auth/LoginModal';
+import LoginModal from '../shared/SharedLoginModal/SharedLoginModal';
 
 function NavBar() {
   const [showLogin, setShowLogin] = useState(false);
@@ -11,10 +11,9 @@ function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect screen size
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint = 1024px
     };
 
     handleResize();
@@ -22,7 +21,6 @@ function NavBar() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Scroll direction detection (close only when scrolling down)
   useEffect(() => {
     let lastScrollY = window.scrollY;
     let ignoreScroll = false;
@@ -48,7 +46,6 @@ function NavBar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [menuOpen]);
 
-  // Token check
   useEffect(() => {
     const token = localStorage.getItem('app-user-token');
     setIsLoggedIn(!!token);
@@ -66,14 +63,14 @@ function NavBar() {
   };
 
   return (
-    <nav className="bg-black text-white shadow-md sticky top-0 z-50">
+    <nav className="header-footer-bg">
       {/* Top bar */}
       <div className="px-6 py-4 flex items-center justify-between">
         <div className="text-lg font-semibold">My Portfolio</div>
 
         {/* Desktop nav */}
         {!isMobile && (
-          <div className="flex gap-6 items-center">
+          <div className="flex items-center gap-6">
             <Link href="/">Home</Link>
             <Link href="/experience">Experience</Link>
             <Link href="/projects">Projects</Link>
@@ -117,11 +114,10 @@ function NavBar() {
       {/* Mobile dropdown menu */}
       {isMobile && (
         <div
-          className={`fixed top-0 left-0 right-0 bg-black z-50 transform transition-transform duration-300 ${
-            menuOpen ? 'translate-y-0' : '-translate-y-full'
-          }`}
+          className={`fixed top-0 left-0 right-0 bg-black z-50 transform transition-transform duration-300 ${menuOpen ? 'translate-y-0' : '-translate-y-full'
+            }`}
         >
-          <div className="px-6 py-4 flex flex-col gap-4 pt-20"> {/* pt-20 to offset top bar */}
+          <div className="px-6 py-4 flex flex-col gap-4 pt-20">
             <Link href="/" onClick={() => setMenuOpen(false)}>Home</Link>
             <Link href="/experience" onClick={() => setMenuOpen(false)}>Experience</Link>
             <Link href="/projects" onClick={() => setMenuOpen(false)}>Projects</Link>

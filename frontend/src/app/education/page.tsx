@@ -1,7 +1,7 @@
 // src/app/education/page.tsx
 'use client';
 
-import SharedModalPageController from '@/components/sharedDashboard/SharedModalPageController';
+import { SharedPageModal } from '@/components/shared';
 import {
   GET_EDUCATIONS,
   DELETE_EDUCATION,
@@ -13,13 +13,13 @@ import {
 
 export default function ExperiencePage() {
   return (
-    <SharedModalPageController
+    <SharedPageModal
       // GraphQL queries and mutations
       query={GET_EDUCATIONS}
       deleteMutation={DELETE_EDUCATION}
       createMutation={CREATE_EDUCATION}
       editMutation={EDIT_EDUCATION}
-      uploadMutation={SINGLE_UPLOAD}
+      uploadFileMutation={SINGLE_UPLOAD}
       deleteFileMutation={DELETE_FILE_FROM_S3}
 
       // Page title and data key
@@ -49,7 +49,7 @@ export default function ExperiencePage() {
         { name: 'description', type: 'textarea', label: 'Description', required: true },
         { name: 'startDate', type: 'date', label: 'Date started', required: true },
         { name: 'endDate', type: 'date', label: 'Date ended' },
-      ]}      
+      ]}
 
       // File fields for uploading files
       fileFields={[

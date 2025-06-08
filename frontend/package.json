@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "next start",
-    "build": "cross-env NODE_ENV=production next build",
+    "build": "next build",
     "dev": "next dev",
     "prod": "npm run build && npm run start",
     "lint": "next lint"
@@ -13,6 +13,7 @@
     "@apollo/client": "^3.13.5",
     "apollo": "^2.11.1",
     "apollo-upload-client": "^17.0.0",
+    "clsx": "^2.1.1",
     "graphql": "^16.10.0",
     "lucide-react": "^0.487.0",
     "next": "^14.2.26",

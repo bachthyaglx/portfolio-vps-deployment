@@ -1,7 +1,8 @@
 // src/app/certificates/page.tsx
 'use client';
 
-import SharedModalPageController from '@/components/sharedDashboard/SharedModalPageController';
+import { SharedPageModal } from '@/components/shared';
+
 import {
   GET_CERTIFICATES,
   DELETE_CERTIFICATE,
@@ -13,13 +14,13 @@ import {
 
 export default function ExperiencePage() {
   return (
-    <SharedModalPageController
+    <SharedPageModal
       // GraphQL queries and mutations
       query={GET_CERTIFICATES}
       deleteMutation={DELETE_CERTIFICATE}
       createMutation={CREATE_CERTIFICATE}
       editMutation={EDIT_CERTIFICATE}
-      uploadMutation={MULTI_UPLOAD}
+      uploadFileMutation={MULTI_UPLOAD}
       deleteFileMutation={DELETE_FILE_FROM_S3}
 
       // Page title and data key
@@ -45,7 +46,7 @@ export default function ExperiencePage() {
         { name: 'skills', type: 'text', label: 'Skills', required: true },
         { name: 'description', type: 'textarea', label: 'Description', required: true },
         { name: 'dateAchieved', type: 'date', label: 'Date ended' },
-      ]}      
+      ]}
 
       // File fields for uploading files
       fileFields={[

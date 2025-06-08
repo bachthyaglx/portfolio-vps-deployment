@@ -1,0 +1,42 @@
+{
+  "data": [
+    {
+      "title": "Pursuing master study in Data Science",
+      "company": "BHT-Berlin",
+      "year": "2025",
+      "tasks": "Attending Data Engineering, Machine Learning, and Big Data. Learning about DevOps practices to support data pipelines and production systems.",
+      "tags": [
+        "Data Engineering",
+        "Machine Learning",
+        "Big Data",
+        "DevOps"
+      ]
+    },
+    {
+      "title": "Doing AWS Certified Developer Associate",
+      "company": "Amazon Web Service",
+      "year": "2025",
+      "tasks": "Studying AWS core services and best practices. Building serverless applications using AWS Lambda and API Gateway. Learning how to deploy and manage applications on AWS. Gaining hands-on experience in cloud environments.",
+      "tags": [
+        "Cloud Computing",
+        "Serverless Architecture",
+        "AWS Deployment",
+        "GraphQL APIs"
+      ]
+    },
+    {
+      "title": "Practicing web development",
+      "company": "Self-projects",
+      "year": "2025",
+      "tasks": "Developing full-stack web applications using modern web technologies. Working with relational and non-relational databases.",
+      "tags": [
+        "Reactjs, Nextjs",
+        "TailwindCSS, MaterialUI",
+        "Nodejs, FastAPI, etc...",
+        "RESTful, GraphQL",
+        "Redis",
+        "RDBMS, NRDBMS"
+      ]
+    }
+  ]
+}

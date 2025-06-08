@@ -1,50 +1,40 @@
+// ./src/app/page.tsx
 'use client';
 
 import Typing from '@/components/utils/Typing';
 import SocialMedia from '@/components/utils/SocialMedia';
 import Image from 'next/image'
+import Timeline from '@/components/utils/TimeLine';
 
 export default function HomePage() {
   return (
     <>
-    {/* Greetings and Image */}
-      <div className="flex items-center flex-col min-h-screen desktop:px-20 mobile:p-6 bg-gradient-to-r from-gradientLeft to-gradientRight">
-        
-        <div className="flex mobile:justify-center desktop:flex-row desktop:items-center mobile:flex-col items-center w-full flex-1">
-          
-          <div className="flex flex-col z-20 pointer-events-none text-white desktop:w-3/5 mobile:w-full mobile:text-center">
-            <p className="desktop:text-[5vw] mobile:text-[8vw] font-bold text-lightcyan w-full ">
+      {/* Greetings and Image */}
+      <div className="page-container items-center flex-col mobile:p-6">
+        <div className="flex items-start w-full desktop:flex-row desktop:items-start mobile:justify-center mobile:flex-col">
+          <div className="flex-col z-20 pointer-events-none desktop:w-3/5 mobile:w-full mobile:text-center">
+            <p
+              className="font-bold text-lightcyan w-full leading-tight"
+              style={{ fontSize: 'clamp(2rem, 5vw, 6rem)' }}
+            >
               Greetings, I&apos;m Thy
             </p>
-            <p className="desktop:text-[3vw] mobile:text-[5vw]">A developer specializing in web applications with&nbsp;
+            <p
+              className="mb-4 leading-tight"
+              style={{ fontSize: 'clamp(1.5rem, 3vw, 3.5rem)' }}
+            >
+              A developer specializing in web applications with&nbsp;
               <Typing />
             </p>
-            
-            <SocialMedia size={50} />
 
+            <div className="flex desktop:justify-start mobile:justify-center mt-4">
+              <SocialMedia />
+            </div>
           </div>
 
-          <Image
-            className="w-2/5 mobile:w-full mobile:max-w-xl object-contain self-center animate-scalepulse" 
-            src="/portraitdummy.webp"
-            alt="Portrait"
-            width={800}
-            height={800}
-            priority={true}
-          />
-          
+          <Timeline />
+
         </div>
-      </div>
-      
-      {/* Footer */}
-      <div className="bg-gradient-to-r from-gradientLeft to-gradientRight">
-        {/* <Image className="w-full h-44" src="/transitions/transition_grey.svg" alt="transition" width={800} height={800}/> */}
-        <footer className="flex flex-col items-center">
-            {/* <div className="pt-5">
-                <SocialMedia size={35} />
-            </div> */}
-            <div className="flex text-white text-center p-5">&copy; {new Date().getFullYear()} All rights reserved.</div>
-        </footer>
       </div>
     </>
   );
