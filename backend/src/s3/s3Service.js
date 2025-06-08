@@ -79,6 +79,11 @@ export const uploadFileToS3 = async (userId, filePromise) => {
 
 // ✅ Delete a file from AWS S3
 export const deleteFileFromS3 = async (url) => {
+  if (typeof url !== 'string') {
+    console.warn('🚨 Invalid URL passed to deleteFileFromS3 (not a string):', url);
+    return;
+  }
+
   const bucket = process.env.AWS_S3_BUCKET_NAME;
   const region = process.env.AWS_REGION;
 

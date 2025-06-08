@@ -103,7 +103,7 @@ export default function SharedPageModal({
 
         {isLoggedIn && (
           <>
-            <div className="centered-flex mt-6">
+            <div className="centered-flex mt-6 pb-6">
               <button
                 onClick={() => {
                   setShowForm(true);
