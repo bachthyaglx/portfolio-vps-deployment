@@ -25,7 +25,7 @@ app.use(cors({
 }));
 
 // Middleware
-app.use(graphqlUploadExpress({ maxFileSize: 100_000_000, maxFiles: 5 }));
+app.use(graphqlUploadExpress({ maxFileSize: 300_000_000, maxFiles: 5 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -1,8 +1,8 @@
 // src/app/layout.tsx
 import './globals.css';
-import NavBar from '../components/layout/NavBar';
+import NavBar from '@/components/layout/NavBar';
 import Footer from '@/components/layout/Footer';
-import ApolloWrapper from '../lib/ApolloWrapper';
+import ApolloWrapper from '@/lib/ApolloWrapper';
 import PrefetchQueries from '@/lib/PrefetchQueries';
 
 export const metadata = {

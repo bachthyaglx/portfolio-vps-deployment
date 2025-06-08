@@ -1,5 +1,7 @@
 'use client';
 
+import { isImageFile } from '@/components/utils/fileUtils';
+
 export default function ImagesBlock({ item, fileFields }: any) {
   return (
     <div className="pt-4 flex flex-wrap gap-4">
@@ -7,10 +9,9 @@ export default function ImagesBlock({ item, fileFields }: any) {
         const urls = item[name];
         if (!Array.isArray(urls)) return null;
 
-        return urls.map((url: string, idx: number) => {
-          const ext = url.split('.').pop()?.toLowerCase();
-          const isImage = /jpeg|jpg|png|gif|webp/.test(ext || '');
-          if (!isImage) return null;
+        return urls.map((url: any, idx: number) => {
+          if (typeof url !== 'string') return null;
+          if (!isImageFile(url)) return null;
 
           return (
             <div
@@ -23,7 +24,7 @@ export default function ImagesBlock({ item, fileFields }: any) {
                 rel="noreferrer"
                 className="block hover:scale-105 transition-transform duration-200"
               >
-                <img src={url} alt="file" className="w-[370px] h-auto object-contain" />
+                <img src={url} alt={`image-${idx}`} className="w-[370px] h-auto object-contain" />
               </a>
             </div>
           );
