@@ -19,6 +19,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
+      # Inject .env into frontend for build
+      - name: Create .env for build
+        run: |
+          echo "${{ secrets.EC2_ENV_FILE }}" > frontend/.env
+
       # Build frontend on GitHub Actions (NOT on EC2!)
       - name: Build frontend
         run: |
@@ -26,18 +31,24 @@ jobs:
           npm ci
           npm run build
 
-      # Rsync code and .next build to EC2
+      # Rsync code and .next build to EC2 (frontend + backend)
       - name: Rsync code to EC2
         run: |
+          cd ..
           rsync -avz --delete \
-                    --exclude '.git' \
-                    --exclude '.env' \
-                    --exclude 'node_modules' \
-                    --exclude 'frontend/node_modules' \
-                    --exclude 'frontend/.next/cache' \
-                    --exclude 'frontend/.next/static/cache' \
-                    -e "ssh -o StrictHostKeyChecking=no" \
-                    ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment
+            --exclude '.git' \
+            --exclude '.env' \
+            --exclude 'node_modules' \
+            --exclude 'frontend/node_modules' \
+            --exclude 'frontend/.next/cache' \
+            --exclude 'frontend/.next/static/cache' \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment
+
+      # Rsync .env to EC2 (if you want to also update .env on VPS)
+      - name: Rsync .env to EC2 (frontend only)
+        run: |
+          rsync -avz frontend/.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.env
 
       # Restart services on EC2 (backend + frontend)
       - name: Restart services on EC2
@@ -48,5 +59,5 @@ jobs:
             pm2 restart backend || pm2 start npm --name backend -- start
 
             cd ~/portfolio-vps-deployment/frontend
-            pm2 restart frontend || pm2 start npm --name frontend -- start
+            pm2 restart frontend --update-env || pm2 start npm --name frontend -- start
           EOF
