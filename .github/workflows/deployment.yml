@@ -25,8 +25,14 @@ jobs:
             set -e
             cd ~/portfolio-vps-deployment
             git pull origin main
+
+            # Backend
             cd backend
             pm2 restart backend
+
+            # Frontend
             cd ../frontend
+            npm install
+            npm run build
             pm2 restart frontend
           EOF
