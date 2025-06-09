@@ -1,8 +1,9 @@
 'use client';
 
 import formatMonthYear from '@/components/utils/formatMonthYear';
+import { DateDisplayProps } from '../interface/DateDisplay.interface';
 
-export default function DateDisplay({ item, textFields }: any) {
+export default function DateDisplay({ item, textFields }: DateDisplayProps) {
   const start = textFields.start ? item[textFields.start] : null;
   const end = textFields.end ? item[textFields.end] : null;
 

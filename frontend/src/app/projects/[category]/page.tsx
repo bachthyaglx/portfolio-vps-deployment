@@ -33,7 +33,7 @@ export default function ProjectsByCategoryPage() {
         title: 'title',
         description: 'description',
         tags: 'skills',
-        subtitle: 'projectUrl',
+        url: 'projectUrl',
       }}
 
       // Buttons of modification

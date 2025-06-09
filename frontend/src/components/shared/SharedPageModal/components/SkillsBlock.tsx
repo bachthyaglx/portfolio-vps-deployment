@@ -1,6 +1,9 @@
 'use client';
 
-export default function SkillsBlock({ item, textFields }: any) {
+import React from 'react';
+import { SkillsBlockProps } from '../interface/SkillsBlock.interface';
+
+export default function SkillsBlock({ item, textFields }: SkillsBlockProps) {
   if (!textFields.tags || !item[textFields.tags] || !Array.isArray(item[textFields.tags])) return null;
 
   return (

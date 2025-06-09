@@ -50,7 +50,7 @@ export default function ExperiencePage() {
 
       // File fields for uploading files
       fileFields={[
-        { name: 'certificateFileUrl', label: 'Certificate', mode: 'multiupload' },
+        { name: 'certificateFileUrl', label: 'Certificate File', mode: 'multiupload', display: 'iframe' },
       ]}
     />
   );

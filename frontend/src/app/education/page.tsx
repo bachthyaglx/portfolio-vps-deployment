@@ -53,9 +53,9 @@ export default function ExperiencePage() {
 
       // File fields for uploading files
       fileFields={[
-        { name: 'degreeFileUrl', label: 'Degree File', mode: 'singleupload' },
-        { name: 'transcriptFileUrl', label: 'Transcript File', mode: 'singleupload' },
-        { name: 'enrollmentFileUrl', label: 'Enrollment File', mode: 'singleupload' },
+        { name: 'degreeFileUrl', label: 'Degree File', mode: 'singleupload', display: 'file' },
+        { name: 'transcriptFileUrl', label: 'Transcript File', mode: 'singleupload', display: 'file' },
+        { name: 'enrollmentFileUrl', label: 'Enrollment File', mode: 'singleupload', display: 'file' },
       ]}
     />
   );

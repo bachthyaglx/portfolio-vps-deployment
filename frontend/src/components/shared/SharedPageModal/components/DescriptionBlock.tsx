@@ -1,6 +1,9 @@
 'use client';
 
-export default function DescriptionBlock({ item, textFields }: any) {
+import React from 'react';
+import { DescriptionBlockProps } from '../interface/DescriptionBlock.interface';
+
+export default function DescriptionBlock({ item, textFields }: DescriptionBlockProps) {
   if (!textFields.description || !item[textFields.description]) return null;
 
   return (

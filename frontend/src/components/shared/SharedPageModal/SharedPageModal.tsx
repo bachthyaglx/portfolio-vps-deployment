@@ -6,7 +6,9 @@ import { useIsLoggedIn } from '@/hooks/useIsLoggedIn';
 import { useState } from 'react';
 import LoginModal from '@/components/shared/SharedLoginModal/SharedLoginModal';
 import DateDisplay from './components/DateDisplay';
-import ProgramAndFileLinks from './components/ProgramAndFileLinks';
+import Title from './components/Title';
+import GitHubURL from './components/GitHubURL';
+import FilesBlock from './components/FilesBlock';
 import DescriptionBlock from './components/DescriptionBlock';
 import SkillsBlock from './components/SkillsBlock';
 import ImagesBlock from './components/ImagesBlock';
@@ -66,12 +68,7 @@ export default function SharedPageModal({
               <DateDisplay item={item} textFields={textFields} />
               <div className="flex-1 w-full min-w-0 space-y-2">
                 <div className="flex flex-wrap justify-between items-start gap-2">
-                  <h3 className="text-lg font-bold text-white group-hover:text-cyan-300 transition">
-                    {item[textFields.title]}{' '}
-                    {textFields.subtitle && item[textFields.subtitle] && (
-                      <span className="text-cyan-300">@ {item[textFields.subtitle]}</span>
-                    )}
-                  </h3>
+                  <Title item={item} textFields={textFields} />
                   {isLoggedIn && (
                     <div className="flex gap-3">
                       <button
@@ -92,7 +89,8 @@ export default function SharedPageModal({
                     </div>
                   )}
                 </div>
-                <ProgramAndFileLinks item={item} textFields={textFields} fileFields={fileFields} />
+                <GitHubURL item={item} textFields={textFields} />
+                <FilesBlock item={item} fileFields={fileFields} />
                 <DescriptionBlock item={item} textFields={textFields} />
                 <SkillsBlock item={item} textFields={textFields} />
                 <ImagesBlock item={item} fileFields={fileFields} />

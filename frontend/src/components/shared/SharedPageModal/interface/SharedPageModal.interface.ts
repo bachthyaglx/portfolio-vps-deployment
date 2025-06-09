@@ -6,16 +6,18 @@ export interface SharedPageModalProps {
   textFields: {
     title: string;
     subtitle?: string;
+    program?: string;
     description: string;
     tags: string;
     start?: string;
     end?: string;
-    program?: string;
+    url?: string;
   };
   fileFields?: {
     name: string;
     label: string;
     mode: 'singleupload' | 'multiupload';
+    display: 'file' | 'iframe';
   }[];
   formFields: any[];
   formTitle?: {

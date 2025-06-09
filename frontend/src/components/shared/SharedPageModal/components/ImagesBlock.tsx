@@ -1,9 +1,12 @@
 'use client';
 
-export default function ImagesBlock({ item, fileFields }: any) {
+import React from 'react';
+import { ImagesBlockProps } from '../interface/ImagesBlock.interface';
+
+export default function ImagesBlock({ item, fileFields }: ImagesBlockProps) {
   return (
     <div className="pt-4 flex flex-wrap gap-4">
-      {fileFields.map(({ name, mode }: any) => {
+      {fileFields.map(({ name, mode }) => {
         const urls = item[name];
         if (!Array.isArray(urls)) return null;
 
@@ -23,7 +26,11 @@ export default function ImagesBlock({ item, fileFields }: any) {
                 rel="noreferrer"
                 className="block hover:scale-105 transition-transform duration-200"
               >
-                <img src={url} alt="file" className="w-[370px] h-auto object-contain" />
+                <img
+                  src={url}
+                  alt="file"
+                  className="w-[370px] h-auto object-contain"
+                />
               </a>
             </div>
           );

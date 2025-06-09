@@ -1,6 +1,9 @@
 'use client';
 
-export default function DeleteDialog({ isOpen, onClose, onConfirm }: any) {
+import React from 'react';
+import { DeleteDialogProps } from '../interface/DeleteDialog.interface';
+
+export default function DeleteDialog({ isOpen, onClose, onConfirm }: DeleteDialogProps) {
   if (!isOpen) return null;
 
   return (
