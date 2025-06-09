@@ -19,22 +19,32 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
+      # Build frontend on GitHub Actions (NOT on EC2!)
       - name: Build frontend
         run: |
           cd frontend
           npm ci
           npm run build
 
+      # Rsync code and .next build to EC2
       - name: Rsync code to EC2
         run: |
-          rsync -avz --exclude '.git' --exclude 'node_modules' --exclude 'frontend/node_modules' --exclude 'frontend/.next/cache' -e "ssh -o StrictHostKeyChecking=no" ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment
+          rsync -avz --exclude '.git' \
+                     --exclude 'node_modules' \
+                     --exclude 'frontend/node_modules' \
+                     --exclude 'frontend/.next/cache' \
+                     --exclude 'frontend/.next/static/cache' \
+                     -e "ssh -o StrictHostKeyChecking=no" \
+                     ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment
 
+      # Restart services on EC2 (backend + frontend)
       - name: Restart services on EC2
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             set -ex
             cd ~/portfolio-vps-deployment/backend
-            pm2 restart backend
-            cd ../frontend
-            pm2 restart frontend
+            pm2 restart backend || pm2 start npm --name backend -- start
+
+            cd ~/portfolio-vps-deployment/frontend
+            pm2 restart frontend || pm2 start npm --name frontend -- start
           EOF
