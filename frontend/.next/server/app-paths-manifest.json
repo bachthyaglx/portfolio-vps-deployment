@@ -1,7 +1,10 @@
 {
-  "/education/page": "app/education/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/certificates/page": "app/certificates/page.js",
-  "/page": "app/page.js",
   "/experience/page": "app/experience/page.js",
-  "/projects/page": "app/projects/page.js"
+  "/education/page": "app/education/page.js",
+  "/page": "app/page.js",
+  "/contact/page": "app/contact/page.js",
+  "/projects/page": "app/projects/page.js",
+  "/projects/[category]/page": "app/projects/[category]/page.js"
 }
