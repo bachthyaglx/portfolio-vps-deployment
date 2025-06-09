@@ -36,7 +36,7 @@ jobs:
           npm ci
           npm run build
 
-      # Rsync code and .next build to EC2 (frontend + backend)
+      # Rsync code (without .next) to EC2
       - name: Rsync code to EC2
         run: |
           cd ..
@@ -45,17 +45,23 @@ jobs:
             --exclude '.env' \
             --exclude 'node_modules' \
             --exclude 'frontend/node_modules' \
-            --exclude 'frontend/.next/cache' \
-            --exclude 'frontend/.next/static/cache' \
+            --exclude 'frontend/.next' \
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment
 
-      # Rsync .env to EC2 (frontend)
+      # Rsync frontend .next separately to EC2
+      - name: Rsync frontend build (.next) to EC2
+        run: |
+          rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            frontend/.next ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.next
+
+      # Rsync frontend .env to EC2
       - name: Rsync frontend .env to EC2
         run: |
           rsync -avz frontend/.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.env
 
-      # Rsync .env to EC2 (backend)
+      # Rsync backend .env to EC2
       - name: Rsync backend .env to EC2
         run: |
           rsync -avz backend/.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/backend/.env
