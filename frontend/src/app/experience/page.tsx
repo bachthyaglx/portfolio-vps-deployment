@@ -52,9 +52,9 @@ export default function ExperiencePage() {
 
       // File fields for uploading files
       fileFields={[
-        { name: 'contractFileUrl', label: 'Contract File', mode: 'singleupload' },
-        { name: 'feedbackFileUrl', label: 'Reference File', mode: 'singleupload' },
-        { name: 'demoFileUrl', label: 'Demo File', mode: 'singleupload' },
+        { name: 'contractFileUrl', label: 'Contract File', mode: 'singleupload', display: 'file' },
+        { name: 'feedbackFileUrl', label: 'Reference File', mode: 'singleupload', display: 'file' },
+        { name: 'demoFileUrl', label: 'Demo File', mode: 'singleupload', display: 'file' },
       ]}
     />
   );
