@@ -20,9 +20,14 @@ jobs:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
       # Inject .env into frontend for build
-      - name: Create .env for build
+      - name: Create .env for frontend build
         run: |
-          echo "${{ secrets.EC2_ENV_FILE }}" > frontend/.env
+          echo "${{ secrets.EC2_FRONTEND_ENV_FILE }}" > frontend/.env
+
+      # Inject .env for backend (optional but recommended)
+      - name: Create .env for backend deploy
+        run: |
+          echo "${{ secrets.EC2_BACKEND_ENV_FILE }}" > backend/.env
 
       # Build frontend on GitHub Actions (NOT on EC2!)
       - name: Build frontend
@@ -45,10 +50,15 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment
 
-      # Rsync .env to EC2 (if you want to also update .env on VPS)
-      - name: Rsync .env to EC2 (frontend only)
+      # Rsync .env to EC2 (frontend)
+      - name: Rsync frontend .env to EC2
         run: |
           rsync -avz frontend/.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.env
+
+      # Rsync .env to EC2 (backend)
+      - name: Rsync backend .env to EC2
+        run: |
+          rsync -avz backend/.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/backend/.env
 
       # Restart services on EC2 (backend + frontend)
       - name: Restart services on EC2
@@ -56,7 +66,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             set -ex
             cd ~/portfolio-vps-deployment/backend
-            pm2 restart backend || pm2 start npm --name backend -- start
+            pm2 restart backend --update-env || pm2 start npm --name backend -- start
 
             cd ~/portfolio-vps-deployment/frontend
             pm2 restart frontend --update-env || pm2 start npm --name frontend -- start
