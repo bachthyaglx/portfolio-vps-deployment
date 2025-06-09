@@ -26,6 +26,8 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+console.log('GRAPHQL_URL:', uri);
+
 export default function ApolloWrapper({ children }: { children: React.ReactNode }) {
   return <ApolloProvider client={client}>{children}</ApolloProvider>;
 }
