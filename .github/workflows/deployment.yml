@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Deploy to EC2 (Clean/Purify)
 
 on:
   push:
@@ -36,17 +36,17 @@ jobs:
           npm ci
           npm run build
 
-      # === CLEAN FRONTEND ===
+      # === CLEAN WHOLE DEPLOY FOLDER (trừ .git) ===
 
-      # Clear frontend build and public folder on EC2 (safe)
-      - name: Clear frontend build and public folder on EC2
+      - name: Clean deploy folder on EC2 (except .git)
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            rm -rf ~/portfolio-vps-deployment/frontend/.next
-            rm -rf ~/portfolio-vps-deployment/frontend/public/*
+            cd ~/portfolio-vps-deployment
+            find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
           EOF
 
-      # Rsync frontend source code
+      # === SYNC FRONTEND ===
+
       - name: Rsync frontend source code
         run: |
           rsync -avz --delete \
@@ -55,7 +55,6 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             frontend/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/
 
-      # Rsync frontend build (.next)
       - name: Rsync frontend build (.next)
         run: |
           rsync -avz --delete \
@@ -64,30 +63,12 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             frontend/.next/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.next
 
-      # Rsync frontend .env
       - name: Rsync frontend .env
         run: |
           rsync -avz frontend/.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.env
 
-      # Rsync frontend node_modules
-      - name: Rsync frontend node_modules
-        run: |
-          rsync -avz --delete \
-            -e "ssh -o StrictHostKeyChecking=no" \
-            frontend/node_modules/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/node_modules/
+      # === SYNC BACKEND ===
 
-      # Rsync frontend package.json + package-lock.json
-      - name: Rsync frontend package.json and lockfile
-        run: |
-          rsync -avz frontend/package.json frontend/package-lock.json ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/
-
-      # === CLEAN BACKEND ===
-
-      - name: Clear backend folder on EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "rm -rf ~/portfolio-vps-deployment/backend/*"
-
-      # Rsync backend source code
       - name: Rsync backend source code
         run: |
           rsync -avz --delete \
@@ -95,13 +76,11 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             backend/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/backend/
 
-      # Rsync backend .env
       - name: Rsync backend .env
         run: |
           rsync -avz backend/.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/backend/.env
 
-      # Install backend dependencies
-      - name: Install backend dependencies on EC2
+      - name: Install backend dependencies
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd ~/portfolio-vps-deployment/backend
