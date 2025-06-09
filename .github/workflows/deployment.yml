@@ -1,4 +1,4 @@
-name: Deploy to EC2 (Safe deploy, repeatable)
+name: Deploy to EC2 (Universal)
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
           npm ci
           npm run build
 
-      # Clean frontend .next only
+      # Clean frontend .next on EC2 (safe clean)
       - name: Clean frontend .next on EC2
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "rm -rf ~/portfolio-vps-deployment/frontend/.next"
@@ -98,7 +98,7 @@ jobs:
             pm2 delete backend || true
             pm2 start npm --name backend -- start
 
-            # Frontend restart (serve .next, no need next start)
+            # Frontend restart (serve .next)
             cd ~/portfolio-vps-deployment/frontend
             echo ">>> Restarting frontend"
             pm2 stop frontend || true
