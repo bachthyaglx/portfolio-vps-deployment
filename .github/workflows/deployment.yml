@@ -24,7 +24,7 @@ jobs:
         run: |
           echo "${{ secrets.EC2_FRONTEND_ENV_FILE }}" > frontend/.env
 
-      # Inject .env for backend (optional but recommended)
+      # Inject .env for backend
       - name: Create .env for backend deploy
         run: |
           echo "${{ secrets.EC2_BACKEND_ENV_FILE }}" > backend/.env
@@ -36,25 +36,29 @@ jobs:
           npm ci
           npm run build
 
-      # Rsync code (without .next) to EC2
-      - name: Rsync code to EC2
+      # Rsync frontend source code to EC2
+      - name: Rsync frontend source code to EC2
         run: |
-          cd ..
           rsync -avz --delete \
-            --exclude '.git' \
-            --exclude '.env' \
             --exclude 'node_modules' \
-            --exclude 'frontend/node_modules' \
-            --exclude 'frontend/.next' \
+            --exclude '.next' \
             -e "ssh -o StrictHostKeyChecking=no" \
-            ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment
+            frontend/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/
 
-      # Rsync frontend .next separately to EC2
+      # Rsync frontend build (.next) to EC2
       - name: Rsync frontend build (.next) to EC2
         run: |
           rsync -avz --delete \
             -e "ssh -o StrictHostKeyChecking=no" \
             frontend/.next ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.next
+
+      # Rsync backend source code to EC2
+      - name: Rsync backend source code to EC2
+        run: |
+          rsync -avz --delete \
+            --exclude 'node_modules' \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            backend/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/backend/
 
       # Rsync frontend .env to EC2
       - name: Rsync frontend .env to EC2
