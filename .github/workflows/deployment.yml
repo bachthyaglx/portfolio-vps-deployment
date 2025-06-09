@@ -1,4 +1,4 @@
-name: Deploy to EC2 (Clean/Purify)
+name: Deploy to EC2 (Safe deploy, repeatable)
 
 on:
   push:
@@ -29,24 +29,19 @@ jobs:
         run: |
           echo "${{ secrets.EC2_BACKEND_ENV_FILE }}" > backend/.env
 
-      # Build frontend on GitHub Actions (NOT on EC2!)
+      # Build frontend on GitHub Actions
       - name: Build frontend
         run: |
           cd frontend
           npm ci
           npm run build
 
-      # === CLEAN WHOLE DEPLOY FOLDER (trừ .git) ===
-
-      - name: Clean deploy folder on EC2 (except .git)
+      # Clean frontend .next only
+      - name: Clean frontend .next on EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd ~/portfolio-vps-deployment
-            find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
-          EOF
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "rm -rf ~/portfolio-vps-deployment/frontend/.next"
 
-      # === SYNC FRONTEND ===
-
+      # Rsync frontend source code
       - name: Rsync frontend source code
         run: |
           rsync -avz --delete \
@@ -55,6 +50,7 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             frontend/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/
 
+      # Rsync frontend build (.next)
       - name: Rsync frontend build (.next)
         run: |
           rsync -avz --delete \
@@ -63,12 +59,12 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             frontend/.next/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.next
 
+      # Rsync frontend .env
       - name: Rsync frontend .env
         run: |
           rsync -avz frontend/.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.env
 
-      # === SYNC BACKEND ===
-
+      # Rsync backend source code
       - name: Rsync backend source code
         run: |
           rsync -avz --delete \
@@ -76,19 +72,20 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             backend/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/backend/
 
+      # Rsync backend .env
       - name: Rsync backend .env
         run: |
           rsync -avz backend/.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/backend/.env
 
-      - name: Install backend dependencies
+      # Install backend dependencies
+      - name: Install backend dependencies on EC2
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd ~/portfolio-vps-deployment/backend
             npm ci
           EOF
 
-      # === RESTART SERVICES ===
-
+      # Restart services on EC2
       - name: Restart services on EC2
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
@@ -101,10 +98,10 @@ jobs:
             pm2 delete backend || true
             pm2 start npm --name backend -- start
 
-            # Frontend restart
+            # Frontend restart (serve .next, no need next start)
             cd ~/portfolio-vps-deployment/frontend
             echo ">>> Restarting frontend"
             pm2 stop frontend || true
             pm2 delete frontend || true
-            pm2 start npm --name frontend -- start
+            pm2 start "npx serve -s .next -l 3000" --name frontend
           EOF
