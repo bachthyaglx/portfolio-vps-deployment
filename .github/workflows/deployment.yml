@@ -36,6 +36,13 @@ jobs:
           npm ci
           npm run build
 
+      # === DEPLOY FRONTEND ===
+
+      # Clear old frontend build on EC2
+      - name: Clear old frontend build (.next) on EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "rm -rf ~/portfolio-vps-deployment/frontend/.next"
+
       # Rsync frontend source code to EC2
       - name: Rsync frontend source code to EC2
         run: |
@@ -52,6 +59,13 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             frontend/.next/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.next
 
+      # Rsync frontend .env to EC2
+      - name: Rsync frontend .env to EC2
+        run: |
+          rsync -avz frontend/.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.env
+
+      # === DEPLOY BACKEND ===
+
       # Rsync backend source code to EC2
       - name: Rsync backend source code to EC2
         run: |
@@ -60,24 +74,28 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             backend/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/backend/
 
-      # Rsync frontend .env to EC2
-      - name: Rsync frontend .env to EC2
-        run: |
-          rsync -avz frontend/.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.env
-
       # Rsync backend .env to EC2
       - name: Rsync backend .env to EC2
         run: |
           rsync -avz backend/.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/backend/.env
 
-      # Restart services on EC2 (backend + frontend)
+      # === RESTART SERVICES ===
+
+      # Restart services on EC2 with PM2 (safe restart)
       - name: Restart services on EC2
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             set -ex
-            cd ~/portfolio-vps-deployment/backend
-            pm2 restart backend --update-env || pm2 start npm --name backend -- start
 
+            # Backend restart
+            cd ~/portfolio-vps-deployment/backend
+            echo ">>> Restarting backend"
+            pm2 delete backend || true
+            pm2 start npm --name backend -- start
+
+            # Frontend restart
             cd ~/portfolio-vps-deployment/frontend
-            pm2 restart frontend --update-env || pm2 start npm --name frontend -- start
+            echo ">>> Restarting frontend"
+            pm2 delete frontend || true
+            pm2 start npm --name frontend -- start
           EOF
