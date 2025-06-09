@@ -38,9 +38,13 @@ jobs:
 
       # === CLEAN FRONTEND ===
 
-      - name: Clear frontend folder on EC2
+      # Clear frontend build and public folder on EC2 (safe)
+      - name: Clear frontend build and public folder on EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "rm -rf ~/portfolio-vps-deployment/frontend/*"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            rm -rf ~/portfolio-vps-deployment/frontend/.next
+            rm -rf ~/portfolio-vps-deployment/frontend/public/*
+          EOF
 
       # Rsync frontend source code
       - name: Rsync frontend source code
