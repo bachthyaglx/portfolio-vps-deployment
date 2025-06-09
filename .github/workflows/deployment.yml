@@ -1,4 +1,4 @@
-name: Deploy to EC2 (Universal)
+name: Deploy to EC2 (Final Clean, for Next start -p 3000 flow)
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
           npm ci
           npm run build
 
-      # Clean frontend .next on EC2 (safe clean)
+      # Clean frontend .next on EC2
       - name: Clean frontend .next on EC2
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "rm -rf ~/portfolio-vps-deployment/frontend/.next"
@@ -54,8 +54,6 @@ jobs:
       - name: Rsync frontend build (.next)
         run: |
           rsync -avz --delete \
-            --exclude 'cache/webpack' \
-            --exclude 'cache/swc' \
             -e "ssh -o StrictHostKeyChecking=no" \
             frontend/.next/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.next
 
@@ -63,6 +61,13 @@ jobs:
       - name: Rsync frontend .env
         run: |
           rsync -avz frontend/.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/.env
+
+      # Rsync frontend node_modules (needed for next start)
+      - name: Rsync frontend node_modules
+        run: |
+          rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            frontend/node_modules/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/portfolio-vps-deployment/frontend/node_modules/
 
       # Rsync backend source code
       - name: Rsync backend source code
@@ -98,10 +103,10 @@ jobs:
             pm2 delete backend || true
             pm2 start npm --name backend -- start
 
-            # Frontend restart (serve .next)
+            # Frontend restart (next start)
             cd ~/portfolio-vps-deployment/frontend
-            echo ">>> Restarting frontend"
+            echo ">>> Restarting frontend (next start)"
             pm2 stop frontend || true
             pm2 delete frontend || true
-            pm2 start "npx serve -s .next -l 3000" --name frontend
+            pm2 start "npm run start" --name frontend
           EOF
