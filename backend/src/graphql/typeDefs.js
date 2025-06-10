@@ -116,7 +116,7 @@ export const typeDefs = gql`
     me: User
     # getFiles(userId: String!): [String!]
     getWorkExperiences: [WorkExperience!]!
-    getProjects: [Project!]!
+    getProjects(category: String): [Project!]!
     getCertificates: [Certificate!]!
     getEducations: [Education!]!
   }

@@ -27,19 +27,19 @@ export const resolvers = {
 
     getWorkExperiences: async () => {
       const cacheKey = 'work_experiences';
-    
+
       // Check cache first
       const cached = await redis.get(cacheKey);
       if (cached) {
         console.log(`🧠 Redis cache hit: ${cacheKey}!`);
         return JSON.parse(cached);
       }
-    
+
       // If not cached, fetch from DB
       const data = await prisma.workExperience.findMany({
         orderBy: { startDate: 'desc' },
       });
-    
+
       // Cache the result for 1 hour
       await redis.set(cacheKey, JSON.stringify(data), { EX: 3600 });
       console.log(`📦 Redis cache set: ${cacheKey}`);
@@ -47,8 +47,8 @@ export const resolvers = {
       return data;
     },
 
-    getProjects: async () => {
-      const cacheKey = 'projects';
+    getProjects: async (_, { category }) => {
+      const cacheKey = category ? `projects:${category}` : 'projects:all';
 
       const cached = await redis.get(cacheKey);
       if (cached) {
@@ -57,6 +57,7 @@ export const resolvers = {
       }
 
       const data = await prisma.project.findMany({
+        where: category ? { category } : {},
         orderBy: { createdAt: 'desc' },
       });
 
@@ -68,20 +69,20 @@ export const resolvers = {
 
     getCertificates: async () => {
       const cacheKey = 'certificates';
-    
+
       const cached = await redis.get(cacheKey);
       if (cached) {
         console.log(`🧠 Redis cache hit: ${cacheKey}`);
         return JSON.parse(cached);
       }
-    
+
       const data = await prisma.certificate.findMany({
         orderBy: { createdAt: 'desc' },
       });
-    
+
       await redis.set(cacheKey, JSON.stringify(data), { EX: 3600 });
       console.log(`📦 Redis cache set: ${cacheKey}`);
-    
+
       return data;
     },
 
@@ -93,14 +94,14 @@ export const resolvers = {
         console.log(`🧠 Redis cache hit: ${cacheKey}`);
         return JSON.parse(cached);
       }
-    
+
       const data = await prisma.education.findMany({
         orderBy: { createdAt: 'desc' },
       });
-    
+
       await redis.set(cacheKey, JSON.stringify(data), { EX: 3600 });
       console.log(`📦 Redis cache set: ${cacheKey}`);
-    
+
       return data;
     },
   },
@@ -129,7 +130,7 @@ export const resolvers = {
       const accessToken = createToken(user.id, newTokenId);
       return { token: accessToken, user };
     },
-    
+
     singleUpload: async (_, { file }, context) => {
       requireAuth(context.userId);
 
@@ -145,7 +146,7 @@ export const resolvers = {
 
     multiUpload: async (_, { files }, context) => {
       requireAuth(context.userId);
-    
+
       try {
         const urls = await Promise.all(
           files.map((file) => uploadFileToS3(context.userId, file))
@@ -156,7 +157,7 @@ export const resolvers = {
         throw new Error('Multi upload failed');
       }
     },
-    
+
     createWorkExperience: async (_, { input }, context) => {
       requireAuth(context.userId);
 
@@ -175,9 +176,9 @@ export const resolvers = {
         await redis.del('work_experiences');
 
         return experience;
-      } catch(err) {
+      } catch (err) {
         console.error('❌ Error creating work experience:', err);
-        throw new Error('Failed to create work experience: ' + err.message); 
+        throw new Error('Failed to create work experience: ' + err.message);
       }
     },
 
@@ -192,8 +193,12 @@ export const resolvers = {
           },
         });
 
-        // 🧹 Clear cache after creating a new entry
-        await redis.del('projects');
+        // 🧹 Clear all projects cache
+        const keys = await redis.keys('projects:*');
+        if (keys.length > 0) {
+          await redis.del(keys);
+          console.log('🧹 Redis cache cleared: projects:*');
+        }
 
         return project;
       } catch (err) {
@@ -219,9 +224,9 @@ export const resolvers = {
         await redis.del('certificates');
 
         return certificate;
-      } catch(err) {
+      } catch (err) {
         console.error('❌ Error creating certificate:', err);
-        throw new Error('Failed to create certificate: ' + err.message);        
+        throw new Error('Failed to create certificate: ' + err.message);
       }
     },
 
@@ -250,7 +255,7 @@ export const resolvers = {
 
     editWorkExperience: async (_, { id, input }, context) => {
       requireAuth(context.userId);
-    
+
       const updated = await prisma.workExperience.update({
         where: { id },
         data: {
@@ -259,27 +264,34 @@ export const resolvers = {
           endDate: input.endDate || null,
         },
       });
-      
+
       // 🧹 Clear cache after creating a new entry
       await redis.del('work_experiences');
-    
+
       return updated;
     },
 
     editProject: async (_, { id, input }, context) => {
       requireAuth(context.userId);
 
-      const updated = await prisma.project.update({ where: { id }, data: input });
+      const updated = await prisma.project.update({
+        where: { id },
+        data: input,
+      });
 
-      // 🧹 Clear cache after creating a new entry
-      await redis.del('projects');
+      // 🧹 Clear all projects cache
+      const keys = await redis.keys('projects:*');
+      if (keys.length > 0) {
+        await redis.del(keys);
+        console.log('🧹 Redis cache cleared: projects:*');
+      }
 
       return updated;
     },
 
     editCertificate: async (_, { id, input }, context) => {
       requireAuth(context.userId);
-    
+
       const updated = await prisma.certificate.update({
         where: { id },
         data: {
@@ -287,16 +299,16 @@ export const resolvers = {
           dateAchieved: input.dateAchieved,
         },
       });
-      
+
       // 🧹 Clear cache after creating a new entry
-      await redis.del('certificates'); 
-    
+      await redis.del('certificates');
+
       return updated;
     },
 
     editEducation: async (_, { id, input }, context) => {
       requireAuth(context.userId);
-      
+
       try {
         const updated = await prisma.education.update({
           where: { id },
@@ -306,17 +318,17 @@ export const resolvers = {
             endDate: input.endDate || null,
           },
         });
-    
+
         // 🧹 Clear cache after creating a new entry
         await redis.del('educations');
-    
+
         return updated;
       } catch (err) {
         console.error('❌ Error editing education:', err);
         throw new Error('Failed to edit education: ' + err.message);
       }
-    },    
-    
+    },
+
     singleDelete: async (_, { fileUrl }, context) => {
       requireAuth(context.userId);
       try {
@@ -330,10 +342,10 @@ export const resolvers = {
 
     deleteWorkExperience: async (_, { id }, context) => {
       requireAuth(context.userId);
-    
+
       const work = await prisma.workExperience.findUnique({ where: { id } });
       if (!work) throw new Error('Not found');
-    
+
       // Delete files from S3 (contractFileUrl)
       if (work.contractFileUrl) {
         await deleteFileFromS3(work.contractFileUrl);
@@ -343,27 +355,27 @@ export const resolvers = {
       if (work.feedbackFileUrl) {
         await deleteFileFromS3(work.feedbackFileUrl);
       }
-    
+
       // Delete files from S3 (feedbackFileUrl)
       if (work.demoFileUrl) {
         await deleteFileFromS3(work.demoFileUrl);
       }
 
       await prisma.workExperience.delete({ where: { id } });
-      
+
       // 🧹 clear cache
       await redis.del('work_experiences');
-    
+
       return true;
     },
-    
+
     deleteProject: async (_, { id }, context) => {
       requireAuth(context.userId);
       await prisma.project.delete({ where: { id } });
-      
+
       // 🧹 clear cache
       await redis.del('projects');
-    
+
       return true;
     },
 
@@ -371,27 +383,27 @@ export const resolvers = {
       requireAuth(context.userId);
       const cert = await prisma.certificate.findUnique({ where: { id } });
       if (!cert) throw new Error('Not found');
-    
+
       if (cert?.certificateFileUrl) {
         await deleteFileFromS3(cert.certificateFileUrl);
       }
-    
+
       await prisma.certificate.delete({ where: { id } });
 
       // 🧹 clear cache
       await redis.del('certificates');
-    
+
       return true;
     },
-    
+
     deleteEducation: async (_, { id }, context) => {
       requireAuth(context.userId);
       const edu = await prisma.education.findUnique({ where: { id } });
-    
+
       if (edu?.degreeFileUrl) {
         await deleteFileFromS3(edu.degreeFileUrl);
       }
-      
+
       if (edu?.transcriptFileUrl) {
         await deleteFileFromS3(edu.transcriptFileUrl);
       }
@@ -401,11 +413,11 @@ export const resolvers = {
       }
 
       await prisma.education.delete({ where: { id } });
-      
+
       // 🧹 clear cache
       await redis.del('educations');
-    
+
       return true;
-    },    
+    },
   },
 };

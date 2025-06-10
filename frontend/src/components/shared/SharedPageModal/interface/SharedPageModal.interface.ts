@@ -3,6 +3,7 @@ export interface SharedPageModalProps {
   query: any;
   deleteMutation: any;
   dataKey: string;
+  variables?: { [key: string]: any };
   textFields: {
     title: string;
     subtitle?: string;

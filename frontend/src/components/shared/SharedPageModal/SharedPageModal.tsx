@@ -21,6 +21,7 @@ export default function SharedPageModal({
   query,
   deleteMutation,
   dataKey,
+  variables,
   textFields,
   fileFields = [],
   formFields,
@@ -30,7 +31,7 @@ export default function SharedPageModal({
   uploadFileMutation,
   deleteFileMutation,
 }: SharedPageModalProps) {
-  const { data, loading, refetch } = useQuery(query, { fetchPolicy: 'cache-first' });
+  const { data, loading, refetch } = useQuery(query, { fetchPolicy: 'cache-first', variables });
   const [deleteItem] = useMutation(deleteMutation);
   const isLoggedIn = useIsLoggedIn();
 

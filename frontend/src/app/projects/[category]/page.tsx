@@ -29,6 +29,8 @@ export default function ProjectsByCategoryPage() {
       pageTitle={readableTitle(category)}
       dataKey="getProjects"
 
+      variables={{ category }}
+
       textFields={{
         title: 'title',
         description: 'description',
