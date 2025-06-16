@@ -1,9 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Menu, X } from 'lucide-react';
 import LoginModal from '../shared/SharedLoginModal/SharedLoginModal';
+
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/experience', label: 'Experience' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/certificates', label: 'Certificates' },
+  { href: '/education', label: 'Education' },
+  // { href: '/contact', label: 'Contact' },
+];
 
 function NavBar() {
   const [showLogin, setShowLogin] = useState(false);
@@ -11,56 +20,87 @@ function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  // Detect screen size
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024); // lg breakpoint = 1024px
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const updateIsMobile = () => setIsMobile(window.innerWidth < 1024);
+    updateIsMobile();
+    window.addEventListener('resize', updateIsMobile);
+    return () => window.removeEventListener('resize', updateIsMobile);
   }, []);
 
+  // Close menu on scroll down
   useEffect(() => {
     let lastScrollY = window.scrollY;
     let ignoreScroll = false;
+    let timeoutId: NodeJS.Timeout;
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
-      if (menuOpen && !ignoreScroll && currentScrollY > lastScrollY) {
+      if (!ignoreScroll && menuOpen && currentScrollY > lastScrollY) {
         setMenuOpen(false);
       }
-
       lastScrollY = currentScrollY;
     };
 
     if (menuOpen) {
       ignoreScroll = true;
-      const timeout = setTimeout(() => {
+      timeoutId = setTimeout(() => {
         ignoreScroll = false;
       }, 300);
     }
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(timeoutId);
+    };
   }, [menuOpen]);
 
+  // Check login status
   useEffect(() => {
-    const token = localStorage.getItem('app-user-token');
-    setIsLoggedIn(!!token);
+    setIsLoggedIn(!!localStorage.getItem('app-user-token'));
   }, []);
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = useCallback(() => {
     setIsLoggedIn(true);
     setShowLogin(false);
-  };
+  }, []);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     localStorage.removeItem('app-user-token');
     setIsLoggedIn(false);
     window.location.reload();
-  };
+  }, []);
+
+  const renderLinks = (onClick?: () => void) =>
+    navLinks.map(({ href, label }) => (
+      <Link key={href} href={href} onClick={onClick}>
+        {label}
+      </Link>
+    ));
+
+  const renderAuthButton = (extraAction?: () => void) =>
+    isLoggedIn ? (
+      <button
+        onClick={() => {
+          handleLogout();
+          extraAction?.();
+        }}
+        className="border-2 border-red-500 rounded-3xl px-3 py-1 hover:bg-red-500 transition"
+      >
+        Logout
+      </button>
+    ) : (
+      <button
+        onClick={() => {
+          setShowLogin(true);
+          extraAction?.();
+        }}
+        className="border-2 border-white rounded-3xl px-3 py-1 hover:bg-white hover:text-black transition"
+      >
+        Login
+      </button>
+    );
 
   return (
     <nav className="header-footer-bg">
@@ -68,35 +108,12 @@ function NavBar() {
       <div className="px-6 py-4 flex items-center justify-between">
         <div className="text-lg font-semibold">My Portfolio</div>
 
-        {/* Desktop nav */}
-        {!isMobile && (
+        {!isMobile ? (
           <div className="flex items-center gap-6">
-            <Link href="/">Home</Link>
-            <Link href="/experience">Experience</Link>
-            <Link href="/projects">Projects</Link>
-            <Link href="/certificates">Certificates</Link>
-            <Link href="/education">Education</Link>
-            {/* <Link href="/contact">Contact</Link> */}
-            {!isLoggedIn ? (
-              <button
-                onClick={() => setShowLogin(true)}
-                className="border-2 border-white rounded-3xl px-3 py-1 hover:bg-white hover:text-black transition"
-              >
-                Login
-              </button>
-            ) : (
-              <button
-                onClick={handleLogout}
-                className="border-2 border-red-500 rounded-3xl px-3 py-1 hover:bg-red-500 transition"
-              >
-                Logout
-              </button>
-            )}
+            {renderLinks()}
+            {renderAuthButton()}
           </div>
-        )}
-
-        {/* Mobile toggle button */}
-        {isMobile && (
+        ) : (
           <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle Menu">
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -111,45 +128,19 @@ function NavBar() {
         />
       )}
 
-      {/* Mobile dropdown menu */}
+      {/* Mobile menu */}
       {isMobile && (
         <div
           className={`fixed top-0 left-0 right-0 bg-black z-50 transform transition-transform duration-300 ${menuOpen ? 'translate-y-0' : '-translate-y-full'
             }`}
         >
           <div className="px-6 py-4 flex flex-col gap-4 pt-20">
-            <Link href="/" onClick={() => setMenuOpen(false)}>Home</Link>
-            <Link href="/experience" onClick={() => setMenuOpen(false)}>Experience</Link>
-            <Link href="/projects" onClick={() => setMenuOpen(false)}>Projects</Link>
-            <Link href="/certificates" onClick={() => setMenuOpen(false)}>Certificates</Link>
-            <Link href="/education" onClick={() => setMenuOpen(false)}>Education</Link>
-            <Link href="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
-            {!isLoggedIn ? (
-              <button
-                onClick={() => {
-                  setShowLogin(true);
-                  setMenuOpen(false);
-                }}
-                className="border-2 border-white rounded-3xl px-3 py-1 hover:bg-white hover:text-black transition"
-              >
-                Login
-              </button>
-            ) : (
-              <button
-                onClick={() => {
-                  handleLogout();
-                  setMenuOpen(false);
-                }}
-                className="border-2 border-red-500 rounded-3xl px-3 py-1 hover:bg-red-500 transition"
-              >
-                Logout
-              </button>
-            )}
+            {renderLinks(() => setMenuOpen(false))}
+            {renderAuthButton(() => setMenuOpen(false))}
           </div>
         </div>
       )}
 
-      {/* Login modal */}
       <LoginModal
         isOpen={showLogin}
         onClose={() => setShowLogin(false)}
