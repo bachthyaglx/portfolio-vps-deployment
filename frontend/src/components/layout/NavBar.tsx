@@ -76,7 +76,7 @@ function NavBar() {
             <Link href="/projects">Projects</Link>
             <Link href="/certificates">Certificates</Link>
             <Link href="/education">Education</Link>
-            <Link href="/contact">Contact</Link>
+            {/* <Link href="/contact">Contact</Link> */}
             {!isLoggedIn ? (
               <button
                 onClick={() => setShowLogin(true)}
