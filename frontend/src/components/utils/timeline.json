@@ -20,23 +20,14 @@
       "tags": [
         "Cloud Computing",
         "Serverless Architecture",
-        "AWS Deployment",
-        "GraphQL APIs"
+        "AWS Deployment"
       ]
     },
     {
-      "title": "Practicing web development",
-      "company": "Self-projects",
+      "title": "Learning German, aiming for A2",
+      "company": "Self-study",
       "year": "2025",
-      "tasks": "Developing full-stack web applications using modern web technologies. Working with relational and non-relational databases.",
-      "tags": [
-        "Reactjs, Nextjs",
-        "TailwindCSS, MaterialUI",
-        "Nodejs, FastAPI, etc...",
-        "RESTful, GraphQL",
-        "Redis",
-        "RDBMS, NRDBMS"
-      ]
+      "tasks": "Integrate better into local culture and community. Prepare for upper level B1 in next year, and long-term work in Germany"
     }
   ]
 }
